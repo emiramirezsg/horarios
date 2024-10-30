@@ -23,8 +23,7 @@ class CategoriaController extends Controller
  
         $validated = $request->validate([
             'nombre' => 'required',
-            'hrs_trabajo' => ['required', ], 
-            'dias_libres' => 'required',
+            'hrs_trabajo' => ['required', ],
         ]);
     
         Categoria::create($validated);

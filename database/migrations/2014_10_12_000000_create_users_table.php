@@ -26,39 +26,6 @@ class CreateUsersTable extends Migration
             $table->boolean('is_docente')->default(false);
             $table->timestamps();
         });
-
-        // Crear 17 usuarios con rol 'docente'
-        $docentes = [
-            ['name' => 'Alice.Smith', 'email' => 'alicesmith@example.com'],
-            ['name' => 'Bob.Johnson', 'email' => 'bobjohnson@example.com'],
-            ['name' => 'Charlie.Brown', 'email' => 'charliebrown@example.com'],
-            ['name' => 'David.Wilson', 'email' => 'davidwilson@example.com'],
-            ['name' => 'Eva.Davis', 'email' => 'evadavis@example.com'],
-            ['name' => 'Frank.Miller', 'email' => 'frankmiller@example.com'],
-            ['name' => 'Grace.Lee', 'email' => 'gracelee@example.com'],
-            ['name' => 'Hannah.Walker', 'email' => 'hannahwalker@example.com'],
-            ['name' => 'Ian.Hall', 'email' => 'ianhall@example.com'],
-            ['name' => 'Jane.Allen', 'email' => 'janeallen@example.com'],
-            ['name' => 'Kyle.Young', 'email' => 'kyleyoung@example.com'],
-            ['name' => 'Laura.King', 'email' => 'lauraking@example.com'],
-            ['name' => 'Mike.Scott', 'email' => 'mikescott@example.com'],
-            ['name' => 'Nina.Wright', 'email' => 'ninawright@example.com'],
-            ['name' => 'Oscar.Harris', 'email' => 'oscarharris@example.com'],
-            ['name' => 'Paul.Green', 'email' => 'paulgreen@example.com'],
-            ['name' => 'Quinn.Turner', 'email' => 'quinnturner@example.com'],
-        ];
-
-        foreach ($docentes as $docente) {
-            DB::table('users')->insert([
-                'name' => $docente['name'],
-                'email' => $docente['email'],
-                'password' => Hash::make('password'), // Cambia 'password' por la contraseña que prefieras
-                'role' => 'docente',
-                'is_docente' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
     
         Schema::create('aulas', function (Blueprint $table) {
             $table->id();

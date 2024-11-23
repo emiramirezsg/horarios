@@ -40,7 +40,7 @@ class ParaleloController extends Controller
     public function edit(Paralelo $paralelo)
     {
         $cursos = Curso::all();
-        return view('cursos.edit', compact('paralelo', 'cursos'));
+        return view('cursos.index', compact('paralelo', 'cursos'));
     }
 
     public function update(Request $request, Paralelo $paralelo)

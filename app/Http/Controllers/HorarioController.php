@@ -3,57 +3,139 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Horario;
-use App\Models\Docente;
-use App\Models\Curso;
-use App\Models\Materia;
 
 class HorarioController extends Controller
 {
     public function index()
     {
-        $horarios = Horario::all(); // Obtener todos los horarios
+        // Definimos los cursos y paralelos del 1ro al 3ro
+        $cursos = [
+            ['curso' => '1ro', 'paralelo' => 'A'],
+            ['curso' => '1ro', 'paralelo' => 'B'],
+            ['curso' => '2do', 'paralelo' => 'A'],
+            ['curso' => '2do', 'paralelo' => 'B'],
+            ['curso' => '3ro', 'paralelo' => 'A'],
+            ['curso' => '3ro', 'paralelo' => 'B'],
+        ];
 
-        // Si necesitas pasar el usuario, por ejemplo, el usuario autenticado
-        $user = auth()->user(); // Obtener el usuario autenticado
+        // Días de la semana y periodos
+        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+        $periodos = 4; // 4 periodos por día
 
-        return view('horarios.index', compact('horarios', 'user'));
-    }
-    public function generateSchedules(Request $request)
-    {
-        // Aquí puedes implementar la lógica para generar horarios.
-        // Por ejemplo, podrías insertar datos en la tabla `horarios`.
+        // Inicializar la matriz
+        $horarios = [];
 
-        // Obtener todos los docentes, cursos y materias
-        $docentes = Docente::all();
-        $cursos = Curso::all();
-        $materias = Materia::all();
+        // Crear la cabecera de la matriz
+        $horarios[0][0] = 'Curso y Paralelo';
+        $colIndex = 1;
 
-        // Ejemplo de lógica simple para generar horarios
-        foreach ($docentes as $docente) {
-            foreach ($cursos as $curso) {
-                foreach ($materias as $materia) {
-                    Horario::create([
-                        'docente_id' => $docente->id,
-                        'curso_id' => $curso->id,
-                        'materia_id' => $materia->id,
-                        'dia' => 'Lunes', // Ejemplo, puedes usar una lógica más compleja
-                        'hora_inicio' => '08:00:00',
-                        'hora_fin' => '10:00:00',
-                    ]);
+        // Asignar días a la primera fila
+        foreach ($dias as $dia) {
+            for ($periodo = 1; $periodo <= $periodos; $periodo++) {
+                $horarios[0][$colIndex] = $dia . " - " . $this->numeroALetra($periodo); // Mostrar "1er periodo"
+                $colIndex++;
+            }
+        }
+
+        // Rellenar la primera columna con cursos y paralelos
+        $rowIndex = 1;
+        foreach ($cursos as $curso) {
+            $horarios[$rowIndex][0] = $curso['curso'] . ' ' . $curso['paralelo'];
+            for ($i = 1; $i <= $periodos * count($dias); $i++) {
+                // Inicialmente, no hay materias asignadas
+                $horarios[$rowIndex][$i] = '';
+            }
+            $rowIndex++;
+        }
+
+        // Definir las materias y docentes
+        $materias = [
+            'Matemáticas' => [
+                ['docente' => 'Prof. Juan Pérez'],
+                ['docente' => 'Prof. Ana López']
+            ],
+            'Sociales' => [
+                ['docente' => 'Prof. Carlos Gómez'],
+                ['docente' => 'Prof. Teresa Sánchez'],
+                ['docente' => 'Prof. Luis Torres']
+            ],
+            'Artes Plásticas' => [
+                ['docente' => 'Prof. Javier Martínez'],
+            ],
+        ];
+
+        // Definir horas por materia
+        $horasPorMateria = [
+            'Matemáticas' => 5,
+            'Sociales' => 6,
+            'Artes Plásticas' => 4,
+        ];
+
+        // Asignar materias a los horarios
+        foreach ($horarios as $rowIndex => &$row) {
+            if ($rowIndex === 0) continue; // Saltar la fila de cabecera
+
+            // Asignar materias a cada periodo
+            foreach ($horasPorMateria as $materia => $horas) {
+                $horasAsignadas = 0;
+                $intentos = 0; // Contador de intentos
+
+                while ($horasAsignadas < $horas && $intentos < 100) { // Limitar a 100 intentos
+                    $diaIndex = array_rand($dias);
+                    $periodo = rand(1, $periodos);
+
+                    $key = $diaIndex * $periodos + $periodo; // Calcular la clave de la matriz
+
+                    if (empty($row[$key])) {
+                        // Filtrar docentes según la materia
+                        $docentesDisponibles = [];
+
+                        foreach ($materias[$materia] as $docente) {
+                            $docenteEnUso = false;
+
+                            foreach ($horarios as $compareRowIndex => $compareRow) {
+                                if ($compareRowIndex === $rowIndex) continue; // Ignorar la misma fila
+                                if ($compareRow[$key] !== '' && strpos($compareRow[$key], $docente['docente']) !== false) {
+                                    $docenteEnUso = true;
+                                    break;
+                                }
+                            }
+
+                            if (!$docenteEnUso) {
+                                $docentesDisponibles[] = $docente;
+                            }
+                        }
+
+                        // Seleccionar un docente disponible
+                        if (!empty($docentesDisponibles)) {
+                            $docenteSeleccionado = $docentesDisponibles[array_rand($docentesDisponibles)];
+                            $row[$key] = $materia . " (" . $docenteSeleccionado['docente'] . ")";
+                            $horasAsignadas++;
+                        }
+                    }
+                    $intentos++; // Incrementar el contador de intentos
                 }
             }
         }
 
-        return response()->json(['message' => 'Horarios generados correctamente']);
+        // Pasar la matriz a la vista
+        return view('horarios.index', compact('horarios'));
     }
-    public function showHorarios()
+
+    // Función para convertir números a su representación ordinal
+    private function numeroALetra($numero)
     {
-        $user = Auth::user();
-        $horarios = $user->horarios()->with('materia', 'aula')->get(); // Cargar horarios con materias y aulas
-
-        dd($horarios);
-
-        return view('docentevista.index');
+        switch ($numero) {
+            case 1:
+                return "1er periodo";
+            case 2:
+                return "2do periodo";
+            case 3:
+                return "3er periodo";
+            case 4:
+                return "4to periodo";
+            default:
+                return $numero . " periodo";
+        }
     }
 }

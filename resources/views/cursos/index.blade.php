@@ -33,8 +33,8 @@
             padding: 20px;
             transition: transform 0.3s ease;
             position: relative;
-            width: calc(33.333% - 20px); /* Ajustar el ancho y espacio entre tarjetas */
-            box-sizing: border-box; /* Asegura que el padding no afecte al ancho total */
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
         }
 
         .curso-card:hover {
@@ -55,8 +55,8 @@
         }
 
         .botones {
-            display: flex; /* Para alinear los botones en una fila */
-            gap: 10px; /* Espacio entre los botones */
+            display: flex;
+            gap: 10px;
             margin-top: 10px;
         }
 
@@ -171,7 +171,7 @@
 
         /* Estilos para los modales */
         .modal {
-            display: none; /* Ocultar el modal por defecto */
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -179,7 +179,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4); /* Fondo semi-transparente */
+            background-color: rgba(0,0,0,0.4);
         }
 
         .modal-content {

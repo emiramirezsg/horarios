@@ -149,6 +149,8 @@ class CreateUsersTable extends Migration
         Schema::create('periodos', function (Blueprint $table) {
             $table->id();
             $table->string('dia');
+            $table->time('hora_inicio');
+            $table->time('hora_fin');
             $table->foreignId('horario_id')->constrained('horarios')->onDelete('cascade');
             $table->foreignId('docente_id')->constrained('docentes')->onDelete('cascade');
             $table->foreignId('curso_id')->constrained('cursos')->onDelete('cascade');

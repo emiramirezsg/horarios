@@ -44,7 +44,7 @@ class CursoController extends Controller
 
     public function edit(Curso $curso)
     {
-        return view('cursos.edit', compact('curso'));
+        return view('cursos.index', compact('curso'));
     }
 
     public function update(Request $request, Curso $curso)

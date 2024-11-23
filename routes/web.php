@@ -87,6 +87,7 @@ Route::delete('/categorias/{categoria}', [CategoriaController::class, 'destroy']
 // Horarios Routes
 Route::get('/horarios', [HorarioController::class, 'index'])->name('horarios.index');
 
+
 Route::middleware(['auth', 'is_docente'])->group(function () {
     Route::get('/docente/horarios', [DocenteController::class, 'horarios'])->name('docente.horarios');
 });

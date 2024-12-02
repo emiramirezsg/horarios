@@ -345,28 +345,31 @@
 </div>
 
 
-    <!-- Modal Editar Curso -->
+    <!-- Modal para editar curso -->
     <div id="modalEditarCurso" class="modal">
         <div class="modal-content">
-            <span class="modal-close">&times;</span>
             <div class="modal-header">
+                <span class="modal-close">&times;</span>
                 <h2>Editar Curso</h2>
             </div>
             <div class="modal-body">
-                <form action="{{ route('cursos.update', 0) }}" method="POST" id="form-editar-curso">
+                <form action="{{ route('cursos.update', 'id_placeholder') }}" method="POST">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="curso_id" id="curso-id-editar">
+                    <input type="hidden" name="curso_id" id="edit-curso-id">
                     <div class="form-group">
-                        <label for="curso-nombre">Nombre del Curso:</label>
-                        <input type="text" id="curso-nombre" name="nombre" required>
+                        <label for="edit-nombre">Nombre del Curso:</label>
+                        <input type="text" id="edit-nombre" name="nombre" required>
                     </div>
-                    <button type="submit" class="btn btn-editar">Actualizar Curso</button>
-                    <button type="button" class="btn btn-cancelar modal-close">Cancelar</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-agregar-curso">Guardar Cambios</button>
+                        <button type="button" class="btn btn-cancelar modal-close">Cancelar</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+
 
     <!-- Modal Editar Paralelo -->
     <div id="modalEditarParalelo" class="modal">
@@ -464,6 +467,29 @@
             }
         });
     };
-</script>
+    </script>
+    <script>
+        document.querySelectorAll('.btn-editar').forEach(button => {
+            button.addEventListener('click', function() {
+                const cursoId = this.getAttribute('data-curso-id');
+                const cursoNombre = this.getAttribute('data-curso-nombre');
+
+                // Rellenar los campos del modal con los datos del curso
+                document.getElementById('edit-curso-id').value = cursoId;
+                document.getElementById('edit-nombre').value = cursoNombre;
+
+                // Mostrar el modal de edición
+                document.getElementById('modalEditarCurso').style.display = 'block';
+            });
+        });
+
+        // Cerrar el modal cuando se haga clic en la "x"
+        document.querySelectorAll('.modal-close').forEach(closeButton => {
+            closeButton.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+
+    </script>
 </body>
 </html>

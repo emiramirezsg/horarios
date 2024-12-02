@@ -40,7 +40,7 @@ class ParaleloController extends Controller
     public function edit(Paralelo $paralelo)
     {
         $cursos = Curso::all();
-        return view('cursos.index', compact('paralelo', 'cursos'));
+        return view('paralelos.edit', compact('paralelo'));
     }
 
     public function update(Request $request, Paralelo $paralelo)
@@ -48,7 +48,6 @@ class ParaleloController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'cantidad_est' => 'required|integer',
-            'curso_id' => 'required|exists:cursos,id',
         ]);
 
         $paralelo->update($validated);

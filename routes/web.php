@@ -67,6 +67,7 @@ Route::put('/aulas/{aula}', [AulaController::class, 'update'])->name('aulas.upda
 Route::delete('/aulas/{aula}', [AulaController::class, 'destroy'])->name('aulas.destroy');
 
 // Paralelos Routes
+Route::resource('paralelos', ParaleloController::class);
 Route::get('/paralelos', [ParaleloController::class, 'index'])->name('paralelos.index');
 Route::get('/paralelos/create', [ParaleloController::class, 'create'])->name('paralelos.create');
 Route::post('/paralelos', [ParaleloController::class, 'store'])->name('paralelos.store');

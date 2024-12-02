@@ -44,13 +44,13 @@ class CursoController extends Controller
 
     public function edit(Curso $curso)
     {
-        return view('cursos.index', compact('curso'));
+        return view('cursos.edit', compact('curso'));
     }
 
     public function update(Request $request, Curso $curso)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'string|max:255',
         ]);
 
         $curso->update($validated);

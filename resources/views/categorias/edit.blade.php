@@ -95,7 +95,7 @@
                 <label for="hrs_trabajo">Horas de Trabajo</label>
                 <input type="numeric" id="hrs_trabajo" name="hrs_trabajo" value="{{ $categoria->hrs_trabajo }}" required>
             </div>
-            <button type="submit" class="btn-submit">Guardar Cambios</button>
+            <button type="submit" class="btn-submit">Actualizar</button>
             <a href="{{ route('categorias.index') }}" class="btn-cancel">Cancelar</a>
         </form>
     </div>

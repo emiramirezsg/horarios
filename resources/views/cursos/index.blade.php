@@ -224,7 +224,7 @@
 </head>
 <body>
     <a href="{{ route('home') }}" class="btn btn-regresar">Inicio</a>
-    
+
     <div class="container">
         <h2>Lista de Cursos</h2>
         <div class="cursos">
@@ -266,7 +266,7 @@
         </div>
         <a href="#modalAgregarCurso" class="btn btn-agregar-curso open-modal">Agregar Curso</a>
     </div>
-    
+
     <!-- Modal para agregar curso -->
     <div id="modalAgregarCurso" class="modal">
         <div class="modal-content">
@@ -345,44 +345,43 @@
 </div>
 
 
-    <!-- Modal para editar curso -->
+    <!-- Modal Editar Curso -->
     <div id="modalEditarCurso" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-close">&times;</span>
-                <h2>Editar Curso</h2>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('cursos.update', 'id_placeholder') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="curso_id" id="edit-curso-id">
-                    <div class="form-group">
-                        <label for="edit-nombre">Nombre del Curso:</label>
-                        <input type="text" id="edit-nombre" name="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-agregar-curso">Guardar Cambios</button>
-                        <button type="button" class="btn btn-cancelar modal-close">Cancelar</button>
-                    </div>
-                </form>
-            </div>
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-header">
+            <h2>Editar Curso</h2>
+        </div>
+        <div class="modal-body">
+            <form action="{{ route('cursos.update', ['curso' => 'CURSO_ID']) }}" method="POST" id="form-editar-curso">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="curso_id" id="curso-id-editar">
+                <div class="form-group">
+                    <label for="curso-nombre">Nombre del Curso:</label>
+                    <input type="text" id="curso-nombre" name="nombre" required>
+                </div>
+                <button type="submit" class="btn btn-editar">Actualizar Curso</button>
+                <button type="button" class="btn btn-cancelar modal-close">Cancelar</button>
+            </form>
         </div>
     </div>
-
+</div>
+  </div>
+        </div>
+    </div>
 
     <!-- Modal Editar Paralelo -->
     <div id="modalEditarParalelo" class="modal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <div class="modal-header">
-                <h2>Editar Paralelo</h2>
+                <h2>Editar Paralelo </h2>
             </div>
             <div class="modal-body">
-                <form action="{{ route('paralelos.update', 0) }}" method="POST" id="form-editar-paralelo">
+            <form action="{{ route('paralelos.update', ['paralelo' => 'PARALELO_ID']) }}" method="POST" id="form-editar-paralelo">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="paralelo_id" id="paralelo-id-editar">
                     <div class="form-group">
                         <label for="paralelo-nombre-editar">Nombre del Paralelo:</label>
                         <input type="text" id="paralelo-nombre-editar" name="nombre" required>
@@ -400,96 +399,106 @@
 
 
     <script>
-        document.querySelectorAll('.open-modal').forEach(button => {
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                const targetModal = document.querySelector(button.getAttribute('href'));
-                if (targetModal) {
-                    targetModal.style.display = 'block';
-                    const cursoId = button.getAttribute('data-curso-id');
-                    const paraleloId = button.getAttribute('data-paralelo-id');
-                    const paraleloNombre = button.getAttribute('data-paralelo-nombre');
-                    const paraleloCantidad = button.getAttribute('data-paralelo-cantidad');
-
-                    if (cursoId) {
-                        document.getElementById('curso-id').value = cursoId;
-                    }
-                    if (paraleloId) {
-                        document.getElementById('paralelo-id-editar').value = paraleloId;
-                        document.getElementById('paralelo-nombre-editar').value = paraleloNombre;
-                        document.getElementById('paralelo-cantidad-editar').value = paraleloCantidad;
-                    }
-                    if (cursoId && targetModal.id === 'modalAsignarMaterias') {
-                        document.getElementById('curso-id-asignar').value = cursoId;
-                    }
-                }
-            });
-        });
-
-        document.querySelectorAll('.modal-close').forEach(closeButton => {
-            closeButton.addEventListener('click', () => {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.style.display = 'none';
-                });
-            });
-        });
-
-        window.addEventListener('click', event => {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        });
-    </script>
-    <script>
-    // Abre el modal para agregar materia y establece el curso ID
     document.querySelectorAll('.open-modal').forEach(button => {
-        button.addEventListener('click', function () {
-            const cursoId = this.getAttribute('data-curso-id');
-            if (this.href.includes('modalAgregarMateria')) {
-                document.getElementById('curso-id-materia').value = cursoId;
+        button.addEventListener('click', event => {
+            event.preventDefault();
+
+            const targetModal = document.querySelector(button.getAttribute('href'));
+            if (!targetModal) return;
+
+            targetModal.style.display = 'block';
+
+            const cursoId = button.getAttribute('data-curso-id');
+            const paraleloId = button.getAttribute('data-paralelo-id');
+            const paraleloNombre = button.getAttribute('data-paralelo-nombre');
+            const paraleloCantidad = button.getAttribute('data-paralelo-cantidad');
+
+            if (cursoId) {
+                const cursoInput = targetModal.querySelector('#curso-id, #curso-id-asignar, #curso-id-materia');
+                if (cursoInput) cursoInput.value = cursoId;
+            }
+
+            if (paraleloId) {
+            const formEditarParalelo = document.getElementById('form-editar-paralelo');
+            if (formEditarParalelo) {
+                const actionUrl = formEditarParalelo.getAttribute('action').replace('PARALELO_ID', paraleloId);
+                formEditarParalelo.setAttribute('action', actionUrl);
+            }
+        }
+            if (paraleloId) {
+                const paraleloIdInput = targetModal.querySelector('#paralelo-id-editar');
+                const paraleloNombreInput = targetModal.querySelector('#paralelo-nombre-editar');
+                const paraleloCantidadInput = targetModal.querySelector('#paralelo-cantidad-editar');
+                if (paraleloIdInput) paraleloIdInput.value = paraleloId;
+                if (paraleloNombreInput) paraleloNombreInput.value = paraleloNombre;
+                if (paraleloCantidadInput) paraleloCantidadInput.value = paraleloCantidad;
             }
         });
     });
 
-    // Cierra el modal
-    document.querySelectorAll('.modal-close').forEach(button => {
-        button.addEventListener('click', function () {
-            this.closest('.modal').style.display = 'none';
+    document.querySelectorAll('.modal-close').forEach(closeButton => {
+        closeButton.addEventListener('click', () => {
+            const modal = closeButton.closest('.modal');
+            if (modal) modal.style.display = 'none';
         });
     });
 
-    // Cierra el modal al hacer clic fuera de él
-    window.onclick = function(event) {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+    window.addEventListener('click', event => {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('.open-modal').forEach(button => {
+        button.addEventListener('click', event => {
+            event.preventDefault();
+
+            const targetModal = document.querySelector(button.getAttribute('href'));
+            if (!targetModal) return;
+
+            // Muestra el modal
+            targetModal.style.display = 'block';
+
+            // Obtén los atributos de datos del botón
+            const cursoId = button.getAttribute('data-curso-id');
+            const cursoNombre = button.getAttribute('data-curso-nombre');
+            const cursoDescripcion = button.getAttribute('data-curso-descripcion'); // Agregar otros campos si existen
+
+            // Llena los campos del formulario en el modal
+            if (cursoId) {
+                const formEditarCurso = targetModal.querySelector('#form-editar-curso');
+                if (formEditarCurso) {
+                    const actionUrl = formEditarCurso.getAttribute('action').replace('CURSO_ID', cursoId);
+                    formEditarCurso.setAttribute('action', actionUrl);
+                }
+
+                const cursoIdInput = targetModal.querySelector('#curso-id');
+                const cursoNombreInput = targetModal.querySelector('#curso-nombre');
+                const cursoDescripcionInput = targetModal.querySelector('#curso-descripcion'); // Si hay descripción
+                
+                if (cursoIdInput) cursoIdInput.value = cursoId;
+                if (cursoNombreInput) cursoNombreInput.value = cursoNombre;
+                if (cursoDescripcionInput) cursoDescripcionInput.value = cursoDescripcion;
             }
         });
-    };
-    </script>
-    <script>
-        document.querySelectorAll('.btn-editar').forEach(button => {
-            button.addEventListener('click', function() {
-                const cursoId = this.getAttribute('data-curso-id');
-                const cursoNombre = this.getAttribute('data-curso-nombre');
+    });
 
-                // Rellenar los campos del modal con los datos del curso
-                document.getElementById('edit-curso-id').value = cursoId;
-                document.getElementById('edit-nombre').value = cursoNombre;
-
-                // Mostrar el modal de edición
-                document.getElementById('modalEditarCurso').style.display = 'block';
-            });
+    // Cierra el modal al hacer clic en el botón de cerrar
+    document.querySelectorAll('.modal-close').forEach(closeButton => {
+        closeButton.addEventListener('click', () => {
+            const modal = closeButton.closest('.modal');
+            if (modal) modal.style.display = 'none';
         });
+    });
 
-        // Cerrar el modal cuando se haga clic en la "x"
-        document.querySelectorAll('.modal-close').forEach(closeButton => {
-            closeButton.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
-            });
-        });
+    // Cierra el modal al hacer clic fuera del contenido
+    window.addEventListener('click', event => {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    });
+</script>
 
-    </script>
 </body>
 </html>

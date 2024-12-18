@@ -39,21 +39,25 @@ class ParaleloController extends Controller
 
     public function edit(Paralelo $paralelo)
     {
-        $cursos = Curso::all();
         return view('paralelos.edit', compact('paralelo'));
     }
 
     public function update(Request $request, Paralelo $paralelo)
     {
+        if (!$paralelo) {
+            return redirect()->route('cursos.index')->with('error', 'Paralelo no encontrado.');
+        }
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'cantidad_est' => 'required|integer',
+            'nombre' => 'string|max:255',
+            'cantidad_est' => 'integer',
         ]);
 
         $paralelo->update($validated);
 
-        return redirect()->route('cursos.index');
+        return redirect()->route('cursos.index')->with('success', 'Paralelo actualizado con éxito.');
     }
+
 
     public function destroy(Paralelo $paralelo)
     {

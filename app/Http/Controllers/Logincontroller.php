@@ -13,56 +13,60 @@ class Logincontroller extends Controller
 {
     //
     public function register(Request $request){
-        
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
-
+    
         if ($validator->fails()) {
             return redirect()->back()
                              ->withErrors($validator)
                              ->withInput();
         }
-
+    
         $user = new User();
-
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
+    
         Auth::login($user);
         return redirect(route('home'));
     }
+    
     public function login(Request $request){
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-
+    
         if ($validator->fails()) {
             return redirect()->back()
                              ->withErrors($validator)
                              ->withInput();
         }
-
+    
         $credentials = [
-            "name" => $request->name,
+            "email" => $request->email, // Cambiado a email
             "password" => $request->password
         ];
-        $remember = ($request->has('remenber') ? true : false);
-
-        if(Auth::attempt($credentials,$remember)){
+        $remember = ($request->has('remember') ? true : false);
+    
+        if(Auth::attempt($credentials, $remember)){
             $request->session()->regenerate();
+            
+            // Redirigir según el rol del usuario
             if(Auth::user()->role == 'docente'){
                 return redirect()->intended(route('docente.horarios'));
-            }else{}
-            return redirect()->intended(route('home'));
-        }else{
-            return redirect('login');
+            } else {
+                return redirect()->intended(route('home'));
+            }
+        } else {
+            return redirect('login')->withErrors(['email' => 'Credenciales incorrectas']);
         }
     }
+    
     public function logout(Request $request){
         
         Auth::logout();

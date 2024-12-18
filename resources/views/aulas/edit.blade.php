@@ -112,7 +112,7 @@
                 <label for="cantidad_mesas">Cantidad de Mesas</label>
                 <input type="number" id="cantidad_mesas" name="cantidad_mesas" value="{{ $aula->cantidad_mesas }}" required>
             </div>
-            <button type="submit" class="btn-submit">Guardar Cambios</button>
+            <button type="submit" class="btn-submit">Actualizar</button>
             <a href="{{ route('aulas.index') }}" class="btn-cancel">Cancelar</a>
         </form>
     </div>

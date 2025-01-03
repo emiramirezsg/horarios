@@ -37,6 +37,8 @@ class DocenteController extends Controller
         'email' => 'required|email|max:255|unique:users,email',
         'password' => 'required|string|min:6|confirmed',
         'categoria_id' => 'required|exists:categorias,id',
+        'dias_libres' => 'array',
+        'dias_libres.*' => 'nullable|string|max:255',
         'materia_id' => 'array',
         'materia_id.*' => 'nullable|exists:materias,id',
     ], [
@@ -102,6 +104,8 @@ class DocenteController extends Controller
                 'apellido' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . $id, // Asegúrate de permitir el mismo email
                 'categoria_id' => 'required|exists:categorias,id',
+                'dias_libres' => 'array',
+                'dias_libres.*' => 'nullable|string|max:255',
                 'materia_id' => 'array',
                 'materia_id.*' => 'nullable|exists:materias,id',
             ], [
@@ -138,7 +142,7 @@ class DocenteController extends Controller
                             $materia->save();
                         }
                     }
-        
+                    
                     return redirect()->route('docentes.index')->with('success', 'Docente actualizado correctamente');
                 } else {
                     return back()->with('error', 'Error al guardar el docente');
@@ -148,7 +152,6 @@ class DocenteController extends Controller
             }
         }
         
-
         public function destroy($id)
     {
         try {
@@ -168,7 +171,6 @@ class DocenteController extends Controller
         }
     }
 
-    
     /*public function horarios()
     {
         $user = Auth::user();

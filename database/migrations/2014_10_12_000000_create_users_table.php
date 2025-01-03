@@ -74,6 +74,7 @@ class CreateUsersTable extends Migration
             $table->string('email');
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->json('dias_libres')->nullable();
             $table->timestamps();
         });
         

@@ -161,7 +161,29 @@
                     @endforeach
                 </select>
             </div>
+            <div class="form-group">
+            <label for="dia_libre_1">Primer día libre</label>
+                <select name="dias_libres[]" id="dia_libre_1" class="form-control">
+                    <option value="" selected disabled>Selecciona un día</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                </select>
+            </div>
 
+            <div class="form-group">
+                <label for="dia_libre_2">Segundo día libre</label>
+                <select name="dias_libres[]" id="dia_libre_2" class="form-control">
+                    <option value="" selected disabled>Selecciona un día</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                </select>
+            </div>
             <!-- Sección de Materias -->
             @for ($i = 1; $i <= 6; $i++)
                 <div class="materia-container">
@@ -179,8 +201,7 @@
                     <div id="cursos{{ $i }}" class="cursos-list"></div>
                 </div>
             @endfor
-
-
+            
             <button type="submit" class="btn-submit">Guardar</button>
             <a href="{{ route('docentes.index') }}" class="btn-back">Cancelar</a>
         </form>

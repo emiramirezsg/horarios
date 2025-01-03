@@ -134,6 +134,18 @@
                     <h3>{{ $docente->nombre }} {{ $docente->apellido }}</h3>
                     <p><strong>Email:</strong> {{ $docente->email }}</p>
                     <p><strong>Categoría:</strong> {{ $docente->categoria ? $docente->categoria->nombre : 'Categoría no asignada' }}</p>
+                    <td>
+                        @if($docente->dias_libres)
+                            <ul>
+                                @foreach(json_decode($docente->dias_libres) as $dia)
+                                    <li>{{ $dia }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            Sin días libres
+                        @endif
+                    </td>
+
                     <div class="materia-info">
                         <p><strong>Materia Asignada:</strong></p>
                         @if($docente->materias->isNotEmpty())

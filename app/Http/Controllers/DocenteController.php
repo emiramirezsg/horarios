@@ -30,58 +30,60 @@ class DocenteController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'apellido' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email',
-        'password' => 'required|string|min:6|confirmed',
-        'categoria_id' => 'required|exists:categorias,id',
-        'dias_libres' => 'array',
-        'dias_libres.*' => 'nullable|string|max:255',
-        'materia_id' => 'array',
-        'materia_id.*' => 'nullable|exists:materias,id',
-    ], [
-        'email.unique' => 'El correo ya está en uso. Por favor, usa otro correo electrónico.',
-    ]);
-
-    try {
-        // Crear el usuario en la tabla `users`
-        $user = User::create([
-            'name' => $validatedData['nombre'],
-            'email' => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-            'is_docente' => 1,
+    {
+        //dd($request->all());
+        $validatedData = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'categoria_id' => 'required|exists:categorias,id',
+            'dias_libres' => 'array',
+            'dias_libres.*' => 'nullable|string|max:255',
+            'materia_id' => 'array',
+            'materia_id.*' => 'nullable|exists:materias,id',
+        ], [
+            'email.unique' => 'El correo ya está en uso. Por favor, usa otro correo electrónico.',
         ]);
 
-        // Crear el docente en la tabla `docentes`
-        $docente = new Docente();
-        $docente->nombre = $validatedData['nombre'];
-        $docente->apellido = $validatedData['apellido'];
-        $docente->email = $validatedData['email'];
-        $docente->categoria_id = $validatedData['categoria_id'];
-        $docente->user_id = $user->id;
+        try {
+            // Crear el usuario en la tabla `users`
+            $user = User::create([
+                'name' => $validatedData['nombre'],
+                'email' => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']),
+                'is_docente' => 1,
+            ]);
 
-        // Guarda el docente en la base de datos
-        if ($docente->save()) {
-            // Asigna el docente a las materias seleccionadas
-            foreach ($validatedData['materia_id'] as $materiaId) {
-                if ($materiaId) { // Solo si el ID de materia no está vacío
-                    $materia = Materia::find($materiaId);
-                    $materia->docente_id = $docente->id;
-                    $materia->save();
+            // Crear el docente en la tabla `docentes`
+            $docente = new Docente();
+            $docente->nombre = $validatedData['nombre'];
+            $docente->apellido = $validatedData['apellido'];
+            $docente->email = $validatedData['email'];
+            $docente->categoria_id = $validatedData['categoria_id'];
+            $docente->user_id = $user->id;
+            $docente->dias_libres = json_encode($validatedData['dias_libres']);
+            // Guarda el docente en la base de datos
+            if ($docente->save()) {
+                // Asigna el docente a las materias seleccionadas
+                foreach ($validatedData['materia_id'] as $materiaId) {
+                    if ($materiaId) { // Solo si el ID de materia no está vacío
+                        $materia = Materia::find($materiaId);
+                        $materia->docente_id = $docente->id;
+                        $materia->save();
+                    }
                 }
-            }
 
-            return redirect()->route('docentes.index')->with('success', 'Docente creado correctamente');
-        } else {
-            $user->delete();
-            return back()->with('error', 'Error al guardar el docente');
+                return redirect()->route('docentes.index')->with('success', 'Docente creado correctamente');
+            } else {
+                $user->delete();
+                return back()->with('error', 'Error al guardar el docente');
+            }
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
-    } catch (\Exception $e) {
-        return back()->with('error', 'Error: ' . $e->getMessage());
     }
-}
 
     public function show($id)
         {
@@ -99,6 +101,7 @@ class DocenteController extends Controller
 
         public function update(Request $request, $id)
         {
+            //dd($request->all());
             $validatedData = $request->validate([
                 'nombre' => 'required|string|max:255',
                 'apellido' => 'required|string|max:255',
@@ -125,20 +128,18 @@ class DocenteController extends Controller
                 // No actualizamos la contraseña aquí, pero podrías hacerlo si es necesario.
                 $user->save();
         
-                // Encuentra el docente correspondiente
                 $docente = Docente::findOrFail($id);
                 $docente->nombre = $validatedData['nombre'];
                 $docente->apellido = $validatedData['apellido'];
                 $docente->email = $validatedData['email'];
                 $docente->categoria_id = $validatedData['categoria_id'];
+                $docente->dias_libres = json_encode($validatedData['dias_libres']);
                 
-                // Guarda el docente en la base de datos
                 if ($docente->save()) {
-                    // Asigna o actualiza las materias seleccionadas
                     foreach ($validatedData['materia_id'] as $materiaId) {
-                        if ($materiaId) { // Solo si el ID de materia no está vacío
+                        if ($materiaId) { 
                             $materia = Materia::find($materiaId);
-                            $materia->docente_id = $docente->id; // Asigna el ID del docente
+                            $materia->docente_id = $docente->id;
                             $materia->save();
                         }
                     }
@@ -157,12 +158,9 @@ class DocenteController extends Controller
         try {
             $docente = Docente::findOrFail($id);
 
-            // Primero eliminamos el usuario asociado al docente
             if ($docente->user) { 
                 $docente->user->delete();
             }
-
-            // Luego eliminamos el docente
             $docente->delete();
 
             return redirect()->route('docentes.index')->with('success', 'Docente y usuario eliminado correctamente.');

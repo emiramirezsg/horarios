@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Horario;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class HorarioController extends Controller
 {
@@ -137,5 +140,22 @@ class HorarioController extends Controller
             default:
                 return $numero . " periodo";
         }
+    }
+    public function exportarHorarios()
+    {
+        $horarios = Horario::with('paralelo.curso', 'docente.materia')->get();
+
+        $html = view('horarios.pdf', compact('horarios'))->render();
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        return $dompdf->stream('horarios.pdf', ['Attachment' => true]);
     }
 }

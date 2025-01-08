@@ -136,11 +136,10 @@
                     <p><strong>Categoría:</strong> {{ $docente->categoria ? $docente->categoria->nombre : 'Categoría no asignada' }}</p>
                     <td>
                         @if($docente->dias_libres)
-                            <ul>
+                        <p><strong>Dias libres:</strong></p>
                                 @foreach(json_decode($docente->dias_libres) as $dia)
-                                    <li>{{ $dia }}</li>
+                                    <p>{{ $dia }}</p>
                                 @endforeach
-                            </ul>
                         @else
                             Sin días libres
                         @endif
@@ -158,7 +157,6 @@
                     </div>
                 </div>
 
-                <!-- Botones de acción -->
                 <div class="botones">
                     <a href="{{ route('docentes.edit', $docente->id) }}" class="btn btn-editar">Editar</a>
                     <form action="{{ route('docentes.destroy', $docente->id) }}" method="POST" style="display:inline;">

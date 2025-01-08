@@ -101,3 +101,5 @@ Route::post('/cursos/asignar-materias', [CursoController::class, 'asignarMateria
 Route::post('/generate-schedules', [HorarioController::class, 'generateSchedules'])->name('generate.schedules');
 
 Route::get('/mis-horarios', [DocenteController::class, 'showHorarios'])->name('mis.horarios');
+Route::post('/generar-horarios', [HorarioController::class, 'generarHorarios'])->name('generar.horarios');
+Route::get('/exportar-horarios', [HorarioController::class, 'exportarHorarios'])->name('exportar.horarios');

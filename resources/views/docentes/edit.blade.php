@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Docente</title>
-    <link rel="stylesheet" href="css/estilos.css">
     <style>
         body {
             margin: 0;
@@ -114,27 +113,19 @@
                 </select>
             </div>
             <div class="form-group">
-            <label for="dia_libre_1">Primer día libre</label>
-                <select name="dias_libres[]" id="dia_libre_1" class="form-control">
-                    <option value="" selected disabled>Selecciona un día</option>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miércoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="dia_libre_2">Segundo día libre</label>
-                <select name="dias_libres[]" id="dia_libre_2" class="form-control">
-                    <option value="" selected disabled>Selecciona un día</option>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miércoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                </select>
+                @for ($i = 1; $i <= 2; $i++)
+                    <div style="margin-bottom: 15px;">
+                        <label for="dia_libre_{{ $i }}">Día libre {{ $i }}</label>
+                        <select name="dias_libres[]" id="dia_libre_{{ $i }}" class="form-control">
+                            <option value="" selected disabled>Selecciona un día</option>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                        </select>
+                    </div>
+                @endfor
             </div>
             @for ($i = 1; $i <= 6; $i++)
                 <div class="materia-container">

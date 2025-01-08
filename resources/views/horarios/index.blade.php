@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Horarios</title>
     <link rel="stylesheet" href="css/estilos.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
         /* Estilos generales */
         body {
@@ -84,39 +85,73 @@
 </head>
 <body>
     <a href="{{ route('home') }}" class="btn btn-regresar">Inicio</a>
-    
+
     <div class="container">
         <h2>Lista de Horarios</h2>
-        
-        <a href="#modalAgregarHorario" class="btn btn-agregar-horario open-modal">Generar Horario</a>
-        
-        @if(!empty($horarios) && count($horarios) > 1)
-            <table>
-                <thead>
-                    <tr>
-                        @foreach ($horarios[0] as $header)
-                            <th>{{ $header }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    @for ($i = 1; $i < count($horarios); $i++)
-                        <tr>
-                            @foreach ($horarios[$i] as $cell)
-                                <td>{{ $cell }}</td>
-                            @endforeach
-                        </tr>
-                    @endfor
-                </tbody>
-            </table>
-        @else
-            <div class="horarios">
-                <div class="horario-card">
-                    <p><em>No existen horarios</em></p>
-                </div>
-            </div>
-        @endif
+
+
+        <button class="btn btn-primary" id="generar-horarios">
+            Generar Horarios
+        </button>
+        <button class="btn btn-success" id="exportar-horarios">Exportar a PDF</button>
+
+        <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Curso</th>
+            <th>Paralelo</th>
+            <th>Materia</th>
+            <th>Docente</th>
+            <th>Horario</th>
+            <th>dia</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
     </div>
-    
+
 </body>
+
+<script>
+    document.getElementById('generar-horarios').addEventListener('click', function () {
+        fetch("{{ route('generar.horarios') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const tbody = document.querySelector('table tbody');
+                tbody.innerHTML = ''; // Limpiar tabla existente
+
+                // Agregar nuevos periodos a la tabla
+                data.periodos.forEach(periodo => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${periodo.paralelo.curso.nombre}</td>
+                        <td>${periodo.paralelo.nombre}</td>
+                        <td>${periodo.docente.materia.nombre}</td>
+                        <td>${periodo.docente.nombre} ${periodo.docente.apellido}</td>
+                        <td>${periodo.horario.hora_inicio} - ${periodo.horario.hora_fin}</td>
+                        <td>${periodo.dia}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                console.error('Error al generar horarios:', data);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+<script>
+    document.getElementById('exportar-horarios').addEventListener('click', function () {
+        window.location.href = "{{ route('exportar.horarios') }}";
+    });
+</script>
+
 </html>

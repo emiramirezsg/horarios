@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Horario;
+use App\Models\Materia;
+use App\Models\Paralelo;
+use App\Models\Periodo;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
@@ -157,5 +160,87 @@ class HorarioController extends Controller
         $dompdf->render();
 
         return $dompdf->stream('horarios.pdf', ['Attachment' => true]);
+    }
+
+    public function generar()
+    {
+        $dias = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado');
+        $paralelos = Paralelo::get();
+        $horarios = Horario::get();
+
+        foreach($dias as $dia){
+            echo("<br> " . $dia. " |<br> ") ;
+            foreach($paralelos as $paralelo){
+                echo("<br>paralelo: ". $paralelo->id." materia: ");
+
+                $materias = Materia::join('materia_curso', 'materia_curso.materia_id', '=', 'materias.id')
+                    ->where('materia_curso.curso_id', $paralelo->curso_id)->get();
+                //dd(Materia::join('materia_curso', 'materia_curso.materia_id', '=', 'materias.id')
+                //->where('materia_curso.curso_id', $paralelo->curso_id)->toSql());
+
+                foreach($materias as $materia){
+                    echo($materia->id.", ");
+
+                    $horas_semana = $materia->horas_semana;
+                    $cont_horas_continuas = 0;
+
+                    $periodos_materia = Periodo::where('materia_id', $materia->id)
+                        ->where('paralelo_id', $paralelo->id)
+                        ->get();
+                    
+                    $periodos_paralelo = Periodo::where('dia', $dia)
+                        ->where('paralelo_id', $paralelo->id)
+                        ->get();
+
+                    if(count($periodos_materia) >= $horas_semana ){
+                        continue;                        
+                    }
+
+                    if(count($periodos_paralelo) >= 7){
+                        continue;                        
+                    }
+
+                    while($horas_semana > 0 && $cont_horas_continuas < 3 && count($periodos_materia) <= $horas_semana && count($periodos_paralelo) <= 7){
+                        
+                        foreach($horarios as $ind=>$horario){
+                            
+                            $hora_periodo = Periodo::where('dia', $dia)
+                                ->where('docente_id', $materia->docente_id)
+                                ->where('horario_id', $horario->id)
+                                ->get();
+                            
+                            if(count($hora_periodo)==0 && $cont_horas_continuas<3){
+                                $hora_periodo = Periodo::create([
+                                    'dia' => $dia,
+                                    'horario_id' => $horario->id,
+                                    'docente_id' => $materia->docente_id,
+                                    'curso_id' => $paralelo->curso_id,
+                                    'paralelo_id' => $paralelo->id,
+                                    'materia_id' => $materia->id
+                                ]);
+                                $cont_horas_continuas++;
+                                $periodos_paralelo = Periodo::where('dia', $dia)
+                                ->where('paralelo_id', $paralelo->id)
+                                ->get();
+                            }else{
+                                continue;
+                            }
+                        }
+                        $horas_semana = $horas_semana - $cont_horas_continuas;
+                        //dd($horas_semana);
+                        $periodos_paralelo = Periodo::where('dia', $dia)
+                        ->where('paralelo_id', $paralelo->id)
+                        ->get();
+
+                        break;
+                        
+                    }
+
+                }
+                
+            }
+        }
+        //dd($dias);
+
     }
 }

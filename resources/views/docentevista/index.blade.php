@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Horarios</title>
-    <link rel="stylesheet" href="{{ asset('css/estiloshome.css') }}">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -92,7 +91,7 @@
 <body>
     <div class="user-bar">
         <div class="user-info">
-            <h2>{{ Auth::user()->name }}</h2>
+            <h2>{{ Auth::user()->gmail }}</h2>
         </div>
         <form method="POST" action="{{ route('logout') }}">
             @csrf

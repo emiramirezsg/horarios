@@ -29,10 +29,11 @@ class Logincontroller extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        $user->role = 'docente';
         $user->save();
     
         Auth::login($user);
-        return redirect(route('home'));
+        return redirect(route('docentevista.index'));
     }
     
     public function login(Request $request){
@@ -48,7 +49,7 @@ class Logincontroller extends Controller
         }
     
         $credentials = [
-            "email" => $request->email, // Cambiado a email
+            "email" => $request->email,
             "password" => $request->password
         ];
         $remember = ($request->has('remember') ? true : false);
@@ -58,10 +59,10 @@ class Logincontroller extends Controller
             
             // Redirigir según el rol del usuario
             if(Auth::user()->role == 'docente'){
-                return redirect()->intended(route('docente.horarios'));
+                return redirect()->intended(route('docentevista.index'));
             } else {
                 return redirect()->intended(route('home'));
-            }
+            }            
         } else {
             return redirect('login')->withErrors(['email' => 'Credenciales incorrectas']);
         }

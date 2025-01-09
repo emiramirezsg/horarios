@@ -93,6 +93,9 @@
         <button class="btn btn-primary" id="generar-horarios">
             Generar Horarios
         </button>
+        <a class="btn btn-primary"  href="{{ url('horarios/generar') }}">
+            Generar
+        </a>
         <button class="btn btn-success" id="exportar-horarios">Exportar a PDF</button>
 
         <table class="table table-striped">

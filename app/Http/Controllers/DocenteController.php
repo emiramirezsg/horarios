@@ -52,7 +52,7 @@ class DocenteController extends Controller
                 'name' => $validatedData['nombre'],
                 'email' => $validatedData['email'],
                 'password' => bcrypt($validatedData['password']),
-                'is_docente' => 1,
+                'role' => 'docente',
             ]);
 
             // Crear el docente en la tabla `docentes`
@@ -99,13 +99,13 @@ class DocenteController extends Controller
             return view('docentes.edit', compact('docente', 'categorias', 'materias'));
         }
 
-        public function update(Request $request, $id)
+    public function update(Request $request, $id)
         {
             //dd($request->all());
             $validatedData = $request->validate([
                 'nombre' => 'required|string|max:255',
                 'apellido' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $id, // Asegúrate de permitir el mismo email
+                'email' => 'required|email|max:255',//|unique:users,email,' . $id, // Asegúrate de permitir el mismo email
                 'categoria_id' => 'required|exists:categorias,id',
                 'dias_libres' => 'array',
                 'dias_libres.*' => 'nullable|string|max:255',
@@ -115,7 +115,9 @@ class DocenteController extends Controller
                 'email.unique' => 'El correo ya está en uso. Por favor, usa otro correo electrónico.',
             ]);
         
+            /*
             try {
+            */
                 // Encuentra el usuario correspondiente
                 $user = User::where('email', $validatedData['email'])->first();
                 if (!$user) {
@@ -133,9 +135,19 @@ class DocenteController extends Controller
                 $docente->apellido = $validatedData['apellido'];
                 $docente->email = $validatedData['email'];
                 $docente->categoria_id = $validatedData['categoria_id'];
-                $docente->dias_libres = json_encode($validatedData['dias_libres']);
+                if(isset($request->dias_libres)){
+                    $docente->dias_libres = json_encode($validatedData['dias_libres']);
+                }else{
+                    $docente->dias_libres = [];
+                }
                 
                 if ($docente->save()) {
+                    $materias_docente = Materia::where('docente_id', $docente->id)->get();
+                    foreach($materias_docente as $materia_docente){
+                        $materia_docente->docente_id = null;
+                        $materia_docente->save();
+                    }
+
                     foreach ($validatedData['materia_id'] as $materiaId) {
                         if ($materiaId) { 
                             $materia = Materia::find($materiaId);
@@ -148,9 +160,11 @@ class DocenteController extends Controller
                 } else {
                     return back()->with('error', 'Error al guardar el docente');
                 }
+            /*
             } catch (\Exception $e) {
                 return back()->with('error', 'Error: ' . $e->getMessage());
             }
+            */
         }
         
         public function destroy($id)
@@ -169,7 +183,7 @@ class DocenteController extends Controller
         }
     }
 
-    /*public function horarios()
+    public function horarios()
     {
         $user = Auth::user();
         $docente = Docente::where('user_id', $user->id)->first();
@@ -179,5 +193,5 @@ class DocenteController extends Controller
         }
 
         return view('docentevista.index', compact('docente'));
-    }*/
+    }
 }

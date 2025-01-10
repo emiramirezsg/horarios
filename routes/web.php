@@ -105,3 +105,4 @@ Route::get('/mis-horarios', [DocenteController::class, 'showHorarios'])->name('m
 Route::post('/generar-horarios', [HorarioController::class, 'generarHorarios'])->name('generar.horarios');
 Route::get('/exportar-horarios', [HorarioController::class, 'exportarHorarios'])->name('exportar.horarios');
 Route::get('/docentevista', [DocenteController::class, 'index'])->name('docentevista.index');
+Route::get('/horarios/generar', [HorarioController::class, 'generar'])->name('horarios.generar');

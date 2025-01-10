@@ -3,117 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Horarios</title>
-    <link rel="stylesheet" href="css/estilos.css">
+    <title>Horario Escolar</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
-        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
-            background: url('https://www.orientacionandujar.es/wp-content/uploads/2020/08/fondos-para-clases-virtuales-1.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
+            background-color: #f9f9f9;
+            margin: 0;
             padding: 20px;
         }
-
-        /* Estilos para la tabla de horarios */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: #fff;
         }
-
         th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
+            border: 1px solid #ccc;
             text-align: center;
+            padding: 8px;
         }
-
         th {
-            background-color: #f2f2f2;
+            background-color: #f4f4f4;
         }
-
-        /* Estilos para botones */
-        .botones {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .paralelo {
+            font-size: 12px;
+            line-height: 1.2;
         }
-
-        .btn {
-            display: inline-block;
+        button {
             padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #fff;
-            font-size: 0.9em;
-            text-align: center;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
-
-        .btn:hover {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-agregar-horario {
-            background-color: #ffc107;
-        }
-
-        .btn-agregar-horario:hover {
-            background-color: #e0a800;
-        }
-
-        .btn-regresar {
-            background-color: #6c757d;
-            color: #fff;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .btn-regresar:hover {
-            background-color: #5a6268;
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <a href="{{ route('home') }}" class="btn btn-regresar">Inicio</a>
-
-    <div class="container">
-        <h2>Lista de Horarios</h2>
-
-
-        <button class="btn btn-primary" id="generar-horarios">
-            Generar Horarios
-        </button>
-        <a class="btn btn-primary"  href="{{ url('horarios/generar') }}">
-            Generar
-        </a>
-        <button class="btn btn-success" id="exportar-horarios">Exportar a PDF</button>
-
-        <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Curso</th>
-            <th>Paralelo</th>
-            <th>Materia</th>
-            <th>Docente</th>
-            <th>Horario</th>
-            <th>dia</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-    </div>
-
+    <h1>Horario Escolar</h1>
+    <button id="generar-horarios">Generar Horarios</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Día</th>
+                <th>Horario</th>
+            </tr>
+        </thead>
+        <tbody id="horario-body">
+        </tbody>
+    </table>
 </body>
 
 <script>
@@ -128,21 +70,67 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const tbody = document.querySelector('table tbody');
-                tbody.innerHTML = ''; // Limpiar tabla existente
+                const tableHead = document.querySelector('table thead tr');
+                const tbody = document.getElementById('horario-body');
+                tableHead.innerHTML = `
+                    <th>Día</th>
+                    <th>Horario</th>
+                `; 
+                tbody.innerHTML = ''; 
+                const paralelos = data.paralelos; 
+                paralelos.forEach(paralelo => {
+                    const th = document.createElement('th');
+                    th.textContent = `${paralelo.curso.nombre} ${paralelo.nombre}`;
+                    tableHead.appendChild(th);
+                });
+                const dias = [...new Set(data.periodos.map(periodo => periodo.dia))];
+                const horarios = data.horarios;
+                dias.forEach(dia => {
+                    const periodosDia = data.periodos.filter(p => p.dia === dia);
+                    const horariosUnicos = [...new Set(periodosDia.map(p => p.horario.id))];
+                    horariosUnicos.forEach((horarioId, index) => {
+                        const horario = horarios.find(h => h.id === horarioId);
+                        console.log('1');
+                        console.log(horarios);
+                        console.log(data.periodos);
+                        console.log('2');
+                        console.log(horario);
+                        console.log('3');
+                        console.log(horarioId);
+                        console.log('4');
 
-                // Agregar nuevos periodos a la tabla
-                data.periodos.forEach(periodo => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${periodo.paralelo.curso.nombre}</td>
-                        <td>${periodo.paralelo.nombre}</td>
-                        <td>${periodo.docente.materia.nombre}</td>
-                        <td>${periodo.docente.nombre} ${periodo.docente.apellido}</td>
-                        <td>${periodo.horario.hora_inicio} - ${periodo.horario.hora_fin}</td>
-                        <td>${periodo.dia}</td>
-                    `;
-                    tbody.appendChild(row);
+                        const fila = document.createElement('tr');
+                        if (index === 0) {
+                            const tdDia = document.createElement('td');
+                            tdDia.textContent = dia;
+                            tdDia.rowSpan = horariosUnicos.length;
+                            fila.appendChild(tdDia);
+                        }
+                        const tdHorario = document.createElement('td');
+                        if(horario != undefined){
+                            tdHorario.textContent = `${horario.hora_inicio} - ${horario.hora_fin}`;
+                        }else{
+                            tdHorario.textContent = '';
+
+                        }
+                        fila.appendChild(tdHorario);
+                        paralelos.forEach(paralelo => {
+                            const tdParalelo = document.createElement('td');
+                            const periodo = periodosDia.find(p => 
+                                p.paralelo.id === paralelo.id && 
+                                p.horario.id === horarioId
+                            );
+                            if (periodo) {
+                                tdParalelo.textContent = `${periodo.docente.materia.nombre} - ${periodo.docente.nombre} ${periodo.docente.apellido}`;
+                            } else {
+                                tdParalelo.textContent = '';
+                            }
+
+                            fila.appendChild(tdParalelo);
+                        });
+
+                        tbody.appendChild(fila);
+                    });
                 });
             } else {
                 console.error('Error al generar horarios:', data);
@@ -151,10 +139,4 @@
         .catch(error => console.error('Error:', error));
     });
 </script>
-<script>
-    document.getElementById('exportar-horarios').addEventListener('click', function () {
-        window.location.href = "{{ route('exportar.horarios') }}";
-    });
-</script>
-
 </html>

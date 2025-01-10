@@ -12,4 +12,19 @@ class Periodo extends Model
     {
         return $this->hasMany(Horario::class);
     }
+
+    public function paralelo()
+    {
+        return $this->hasMany(Paralelo::class, 'id', 'paralelo_id');
+    }
+
+    public function docente()
+    {
+        return $this->hasMany(Docente::class, 'id', 'docente_id');
+    }
+
+    public function horario()
+    {
+        return $this->hasMany(Horario::class, 'id', 'horario_id');
+    }
 }

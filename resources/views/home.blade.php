@@ -237,14 +237,14 @@
             </div>
         </div>
 
-        <!-- Tarjeta de Paralelos -->
+        <!-- Tarjeta de Horarios -->
         <div class="card">
             <img src="https://www.bizneo.com/blog/wp-content/uploads/2022/03/programa-de-control-horario.jpg" alt="Horarios">
             <div class="card-content">
                 <h2>Horarios</h2>
                 <div class="card-actions">
                     <a href="{{ route('horarios.index') }}" class="btn btn-view">Ver</a>
-                    <a href="{{ route('horarios.index') }}" class="btn btn-manage">Generar horario</a>
+                    <a href="{{ route('horarios.generar') }}" class="btn btn-manage">Generar horario</a>
                 </div>
             </div>
         </div>

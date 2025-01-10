@@ -12,6 +12,11 @@ class Docente extends Model
         return $this->belongsTo(Categoria::class);
     }
 
+    public function materia()
+    {
+        return $this->hasMany(Materia::class, 'id', 'materia_id');
+    }
+
     public function materias()
     {
         return $this->hasMany(Materia::class);
